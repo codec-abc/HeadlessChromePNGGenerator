@@ -12,6 +12,9 @@ namespace crawler
     {
         static void Main(string[] args)
         {
+            if (args.Length != 1) {
+                Console.WriteLine("Please provide a single argument, the path to the json config file.");
+            }
             try 
             {
                 var crawlPath = args[0];
@@ -28,10 +31,7 @@ namespace crawler
                 {
                     try 
                     {
-                        if (File.Exists(action.path))
-                        {
-                            File.Delete(action.path);
-                        }
+                        var tempFilePath = Path.GetTempFileName();;
 
                         Process process = new Process();
                         // Configure the process using the StartInfo properties.
@@ -40,11 +40,11 @@ namespace crawler
                         process.StartInfo.Arguments = 
                             $"--headless --disable-gpu --incognito "  +
                             $"--window-size={action.size.x},{action.size.y} " + 
-                            $"--screenshot=\"{action.path}\" " +
+                            $"--screenshot=\"{tempFilePath}\" " +
                             action.url;
 
-                        Console.Write("\"" + settings.chromePath + "\" ");
-                        Console.WriteLine(process.StartInfo.Arguments);
+                        //Console.Write("\"" + settings.chromePath + "\" ");
+                        //Console.WriteLine(process.StartInfo.Arguments);
 
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         process.StartInfo.WorkingDirectory = directoryPath;
@@ -65,38 +65,47 @@ namespace crawler
                             throw new Exception("chrome exit code returned " + process.ExitCode);
                         }
 
-                        if (File.Exists(action.path))
+                        if (File.Exists(tempFilePath))
                         {
-                            using (var image = Image.Load(action.path))
+                            try 
                             {
-                                image.Mutate
-                                (
-                                    x => x
-                                        .Crop
-                                        (
-                                            new SixLabors.Primitives.Rectangle
+                                using (var image = Image.Load(tempFilePath))
+                                {
+                                    image.Mutate
+                                    (
+                                        x => x
+                                            .Crop
                                             (
-                                                action.crop.topLeftCorner.x,
-                                                action.crop.topLeftCorner.y,
-                                                action.crop.size.x, 
-                                                action.crop.size.y
-                                            )   
-                                        )
-                                );
+                                                new SixLabors.Primitives.Rectangle
+                                                (
+                                                    action.crop.topLeftCorner.x,
+                                                    action.crop.topLeftCorner.y,
+                                                    action.crop.size.x, 
+                                                    action.crop.size.y
+                                                )   
+                                            )
+                                    );
 
-                                image.Save(action.path);
+                                    image.Save(action.path);
+                                }
                             }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.ToString());
+                            }
+
+                            File.Delete(tempFilePath);
                         }
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.ToString());
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine(e.ToString());
             }
 
         }
