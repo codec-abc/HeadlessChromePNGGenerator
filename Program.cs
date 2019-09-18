@@ -8,15 +8,53 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace crawler
 {
+    public class Log
+    {
+        private static StreamWriter sw = null;
+        public static void WriteLine(string str)
+        {
+            try 
+            {
+                if (sw == null)
+                {
+                    sw = File.AppendText("LogFile.txt");
+                }
+
+                if (sw != null && str != null)
+                {
+                    Console.WriteLine("appending text");
+                    sw.WriteLine(str);
+                    sw.Flush();
+                }
+            } catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
+        public static void DisposeLog()
+        {
+            if (sw != null)
+            {
+                sw.Dispose();
+                sw = null;
+            }
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            if (args.Length != 1) {
-                Console.WriteLine("Please provide a single argument, the path to the json config file.");
-            }
             try 
             {
+                Log.WriteLine("====================================");
+                Log.WriteLine("Program starting in " + Directory.GetCurrentDirectory() + " at " + DateTime.Now.ToString("yyyy-MM-dd--hh-mm-ss"));
+                if (args.Length != 1) 
+                {
+                    Log.WriteLine("Please provide a single argument, the path to the json config file.");
+                    throw new Exception();
+                }
+
                 var crawlPath = args[0];
                 var jsonContent = File.ReadAllText(crawlPath);
                 var settings = JsonConvert.DeserializeObject<Settings>(jsonContent);
@@ -43,8 +81,8 @@ namespace crawler
                             $"--screenshot=\"{tempFilePath}\" " +
                             action.url;
 
-                        //Console.Write("\"" + settings.chromePath + "\" ");
-                        //Console.WriteLine(process.StartInfo.Arguments);
+                        //Log.Write("\"" + settings.chromePath + "\" ");
+                        //Log.WriteLine(process.StartInfo.Arguments);
 
                         process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                         process.StartInfo.WorkingDirectory = directoryPath;
@@ -91,7 +129,7 @@ namespace crawler
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine(e.ToString());
+                                Log.WriteLine(e.ToString());
                             }
 
                             File.Delete(tempFilePath);
@@ -99,15 +137,18 @@ namespace crawler
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
+                        Log.WriteLine(e.ToString());
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Log.WriteLine(e.ToString());
             }
-
+            finally
+            {
+                Log.DisposeLog();
+            }
         }
     }
 }
