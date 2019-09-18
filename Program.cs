@@ -47,7 +47,7 @@ namespace crawler
             try 
             {
                 Log.WriteLine("====================================");
-                Log.WriteLine("Program starting in " + Directory.GetCurrentDirectory() + " at " + DateTime.Now.ToString("yyyy-MM-dd--hh-mm-ss"));
+                Log.WriteLine("Program starting in " + Directory.GetCurrentDirectory() + " at " + DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss"));
                 if (args.Length != 1) 
                 {
                     Log.WriteLine("Please provide a single argument, the path to the json config file.");
