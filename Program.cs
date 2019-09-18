@@ -22,7 +22,6 @@ namespace crawler
 
                 if (sw != null && str != null)
                 {
-                    Console.WriteLine("appending text");
                     sw.WriteLine(str);
                     sw.Flush();
                 }
@@ -147,6 +146,8 @@ namespace crawler
             }
             finally
             {
+                Log.WriteLine("Program exiting at " + DateTime.Now.ToString("yyyy-MM-dd--hh-mm-ss"));
+                Log.WriteLine("====================================");
                 Log.DisposeLog();
             }
         }
