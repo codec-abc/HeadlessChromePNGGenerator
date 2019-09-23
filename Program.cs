@@ -146,7 +146,7 @@ namespace crawler
             }
             finally
             {
-                Log.WriteLine("Program exiting at " + DateTime.Now.ToString("yyyy-MM-dd--hh-mm-ss"));
+                Log.WriteLine("Program exiting at " + DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss"));
                 Log.WriteLine("====================================");
                 Log.DisposeLog();
             }
